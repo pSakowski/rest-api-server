@@ -28,14 +28,19 @@ router.get('/random', (req, res) => {
 
 // Add a new testimonial
 router.post('/', (req, res) => {
-   const newTestimonial = {
-     id: uuidv4(),
-     author: req.body.author,
-     text: req.body.text,
-   };
-   db.testimonials.push(newTestimonial);
-   res.json({ message: 'OK' });
-});
+   const { author, text } = req.body;
+   if (!author || !text) {
+     res.status(400).json({ error: 'Please provide author and text fields' });
+   } else {
+     const newTestimonial = {
+       id: uuidv4(),
+       author: author,
+       text: text,
+     };
+     db.testimonials.push(newTestimonial);
+     res.json({ message: 'OK' });
+   }
+ });
 
 // Update a testimonial
 router.put('/:id', (req, res, next) => {
