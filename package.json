@@ -4,5 +4,8 @@
   "main": "index.js",
   "repository": "git@github.com:pSakowski/rest-api-server.git",
   "author": "Piotr Sakowski <p.sakowski1213@gmail.com>",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2"
+  }
 }
