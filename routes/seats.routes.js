@@ -29,15 +29,22 @@ router.get('/random', (req, res) => {
 
 // Add a new seat
 router.post('/', (req, res) => {
-   const newSeat = {
-     id: uuidv4(),
-     day: req.body.day,
-     seat: req.body.seat,
-     client: req.body.client,
-     email: req.body.email,
-   };
-   db.seats.push(newSeat);
-   res.json({ message: 'OK' });
+  const newSeat = {
+    id: uuidv4(),
+    day: req.body.day,
+    seat: req.body.seat,
+    client: req.body.client,
+    email: req.body.email,
+  };
+
+  // Check if the selected seat is already occupied
+  if (db.seats.some(seat => seat.day === newSeat.day && seat.seat === newSeat.seat)) {
+    res.status(409).json({ message: 'Slot is already occupied...' });
+  } else {
+    // Add the new seat to the array
+    db.seats.push(newSeat);
+    res.status(201).json({ message: 'OK' });
+  }
 });
 
 // Update a seat
