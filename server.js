@@ -1,7 +1,6 @@
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
-
 const concertsRouter = require('./routes/concerts.routes');
 const seatsRouter = require('./routes/seats.routes');
 const testimonialsRouter = require('./routes/testimonials.routes');
@@ -14,12 +13,21 @@ app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 app.use(cors());
 
+// Serve static files from the React app
+app.use(express.static(path.join(__dirname, '/client/build')));
+
+// API endpoints
 app.use('/api/concerts', concertsRouter);
 app.use('/api/seats', seatsRouter);
 app.use('/api/testimonials', testimonialsRouter);
 
+// Return the main index.html file for all other routes
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '/client/build/index.html'));
+});
+
 app.use(notFoundRouter);
 
-app.listen(port, () => {
+app.listen(process.env.PORT || port, () => {
   console.log(`Server running at http://localhost:${port}`);
 });
