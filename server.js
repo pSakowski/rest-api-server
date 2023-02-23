@@ -9,14 +9,14 @@ const testimonialsRouter = require('./routes/testimonials.routes');
 const notFoundRouter = require('./routes/404.routes');
 
 const app = express();
-const port = 8000;
+const port = process.env.PORT || 8000;
 
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 app.use(cors());
 
 // Serve static files from the React app
-app.use(express.static(path.join(__dirname, '/client/build')));
+app.use(express.static(path.join(__dirname, '/build')));
 
 // Add middleware to attach the io instance to the request object
 app.use((req, res, next) => {
@@ -31,7 +31,7 @@ app.use('/api/testimonials', testimonialsRouter);
 
 // Return the main index.html file for all other routes
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '/client/build/index.html'));
+  res.sendFile(path.join(__dirname, '/build/index.html'));
 });
 
 app.use(notFoundRouter);
@@ -53,6 +53,6 @@ io.on('connection', (socket) => {
   });
 });
 
-server.listen(process.env.PORT || port, () => {
+server.listen(port, () => {
   console.log(`Server running at http://localhost:${port}`);
 });
