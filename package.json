@@ -1,7 +1,7 @@
 {
   "name": "rest-api-server",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "server.js",
   "repository": "git@github.com:pSakowski/rest-api-server.git",
   "author": "Piotr Sakowski <p.sakowski1213@gmail.com>",
   "license": "MIT",

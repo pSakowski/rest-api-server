@@ -27,7 +27,6 @@ router.get('/random', (req, res) => {
    res.json(randomSeat);
 });
 
-// Add a new seat
 router.post('/', (req, res) => {
   const newSeat = {
     id: uuidv4(),
@@ -43,6 +42,10 @@ router.post('/', (req, res) => {
   } else {
     // Add the new seat to the array
     db.seats.push(newSeat);
+
+    // Emit the seatsUpdated event with the current content of db.seats
+    req.io.emit('seatsUpdated', db.seats);
+
     res.status(201).json({ message: 'OK' });
   }
 });

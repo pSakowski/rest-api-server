@@ -1,7 +1,7 @@
 import { Button, Form, FormGroup, Label, Input, Row, Col, Alert, Progress } from 'reactstrap';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { addSeatRequest, getRequests, loadSeatsRequest } from '../../../redux/seatsRedux';
+import { addSeatRequest, getRequests } from '../../../redux/seatsRedux';
 
 import './OrderTicketForm.scss';
 import SeatChooser from './../SeatChooser/SeatChooser';
@@ -46,21 +46,10 @@ const OrderTicketForm = () => {
         seat: '',
       });
       setIsError(false);
-      await dispatch(loadSeatsRequest()); // update seats view
     } else {
       setIsError(true);
     }
   }
-
-  useEffect(() => {
-    if (requests['ADD_SEAT'] && requests['ADD_SEAT'].success) {
-      const interval = setInterval(() => {
-        dispatch(loadSeatsRequest());
-      }, 120000); // 2 minutes
-
-      return () => clearInterval(interval);
-    }
-  }, [requests, dispatch]);
 
   return (
     <Form className="order-ticket-form" onSubmit={submitForm}>
