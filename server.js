@@ -3,6 +3,7 @@ const cors = require('cors');
 const path = require('path');
 const http = require('http');
 const socketIO = require('socket.io');
+const mongoose = require('mongoose');
 const concertsRouter = require('./routes/concerts.routes');
 const seatsRouter = require('./routes/seats.routes');
 const testimonialsRouter = require('./routes/testimonials.routes');
@@ -18,12 +19,6 @@ app.use(cors());
 // Serve static files from the React app
 app.use(express.static(path.join(__dirname, '/build')));
 
-// Add middleware to attach the io instance to the request object
-app.use((req, res, next) => {
-  req.io = io;
-  next();
-});
-
 // API endpoints
 app.use('/api/concerts', concertsRouter);
 app.use('/api/seats', seatsRouter);
@@ -36,23 +31,33 @@ app.get('*', (req, res) => {
 
 app.use(notFoundRouter);
 
-const server = http.createServer(app);
-const io = socketIO(server, {
-  cors: {
-    origin: '*',
-    methods: ['GET', 'POST'],
-    allowedHeaders: ['Content-Type'],
-  },
+mongoose.connect('mongodb://localhost:27017/companyDB', { useNewUrlParser: true });
+const db = mongoose.connection;
+
+db.once('open', () => {
+  console.log('Connected to the database');
 });
+db.on('error', err => console.log('Error ' + err));
 
-io.on('connection', (socket) => {
-  console.log('New socket!');
+  console.log('Database connection successful');
 
-  socket.on('disconnect', () => {
-    console.log('Socket disconnected');
+  const server = http.createServer(app);
+  const io = socketIO(server, {
+    cors: {
+      origin: '*',
+      methods: ['GET', 'POST'],
+      allowedHeaders: ['Content-Type'],
+    },
   });
-});
 
-server.listen(port, () => {
-  console.log(`Server running at http://localhost:${port}`);
+  io.on('connection', (socket) => {
+    console.log('New socket!');
+
+    socket.on('disconnect', () => {
+      console.log('Socket disconnected');
+    });
+  });
+
+app.listen('8000', () => {
+  console.log('Server is running on port: 8000');
 });
