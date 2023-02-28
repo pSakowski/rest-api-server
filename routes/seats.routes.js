@@ -58,6 +58,10 @@ router.put('/:id', (req, res) => {
     seat.seat = req.body.seat;
     seat.client = req.body.client;
     seat.email = req.body.email;
+
+    // Emit the seatsUpdated event with the current content of db.seats
+    req.io.emit('seatsUpdated', db.seats);
+
     res.json({ message: 'OK' });
   } else {
     res.status(404).json({ message: 'Seat not found' });
@@ -70,6 +74,10 @@ router.delete('/:id', (req, res) => {
   const index = db.seats.findIndex((item) => item.id === id);
   if (index !== -1) {
     db.seats.splice(index, 1);
+
+    // Emit the seatsUpdated event with the current content of db.seats
+    req.io.emit('seatsUpdated', db.seats);
+
     res.json({ message: 'OK' });
   } else {
     res.status(404).json({ message: 'Seat not found' });
