@@ -13,14 +13,17 @@ const SeatChooser = ({ chosenDay, chosenSeat, updateSeat }) => {
 
   useEffect(() => {
     dispatch(loadSeatsRequest());
-  }, [dispatch])
+  }, [dispatch]);
 
   useEffect(() => {
-    const url = (process.env.NODE_ENV === 'production') ? '' : 'http://localhost:8000'
+    const url = (process.env.NODE_ENV === 'production') ? '' : 'http://localhost:8000';
     const socket = io(url, { transports: ["websocket"] });
-    socket.on('seatsUpdated', (seats) =>{
+    socket.on('seatsUpdated', (seats) => {
       dispatch(loadSeats(seats));
-    })
+    });
+    return () => {
+      socket.disconnect();
+    }
   }, [dispatch]);
 
   useEffect(() => {
@@ -40,6 +43,7 @@ const SeatChooser = ({ chosenDay, chosenSeat, updateSeat }) => {
         const takenSeats = seats.filter(item => item.day === chosenDay);
         const freeSeatsCount = 50 - takenSeats.length;
         setFreeSeats(freeSeatsCount);
+        dispatch(loadSeatsRequest());
     })}>{seatId}</Button>;
   };
 
@@ -53,7 +57,7 @@ const SeatChooser = ({ chosenDay, chosenSeat, updateSeat }) => {
       { (requests['LOAD_SEATS'] && requests['LOAD_SEATS'].pending) && <Progress animated color="primary" value={50} /> }
       { (requests['LOAD_SEATS'] && requests['LOAD_SEATS'].error) && <Alert color="warning">Couldn't load seats...</Alert> }
     </div>
-  )
-}
+  );
+};
 
 export default SeatChooser;
