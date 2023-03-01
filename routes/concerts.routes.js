@@ -1,72 +1,94 @@
 const express = require('express');
-const { v4: uuidv4 } = require('uuid');
-const db = require('../db');
-
 const router = express.Router();
+const Concert = require('../models/concert.model');
+const { ObjectId } = require('mongodb');
 
 // Get all concerts
-router.get('/', (req, res) => {
-   res.json(db.concerts);
-});
-
-// Get one concerts by ID
-router.get('/:id', (req, res, next) => {
-   const id = parseInt(req.params.id);
-   const concert = db.concerts.find((item) => item.id == id);
-   if (concert) {
-     res.json(concert);
-   } else {
-     next();
-   }
+router.get('/concerts', async (req, res) => {
+  try {
+    const concerts = await Concert.find();
+    res.json(concerts);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
 });
 
 // GET random concerts
-router.get('/random', (req, res) => {
-   const randomIndex = Math.floor(Math.random() * db.concerts.length);
-   const randomConcert = db.concerts[randomIndex];
-   res.json(randomConcert);
+router.get('/concerts/random', async (req, res) => {
+  try {
+    const count = await Concert.countDocuments();
+    const randomIndex = Math.floor(Math.random() * count);
+    const randomConcert = await Concert.findOne().skip(randomIndex);
+    res.json(randomConcert);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+// Get one concert by ID
+router.get('/concerts/:id', async (req, res) => {
+  const { id } = req.params;
+  try {
+    if (!ObjectId.isValid(id)) {
+      return res.status(400).json({ message: 'Invalid ID' });
+    }
+    const concert = await Concert.findById(id);
+    if (!concert) {
+      return res.status(404).json({ message: 'Not found' });
+    }
+    res.json(concert);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
 });
 
 // Add a new concerts
-router.post('/', (req, res) => {
-   const newConcert = {
-     id: uuidv4(),
-     performer: req.body.performer,
-     genre: req.body.genre,
-     price: req.body.price,
-     day: req.body.day,
-     image: req.body.image,
-   };
-   db.concerts.push(newConcert);
-   res.json(newConcert);
+router.post('/concerts', async (req, res) => {
+  const { id, performer, genre, price, day, image } = req.body;
+  try {
+    const newConcert = new Concert({id, performer, genre, price, day, image});
+    const savedConcert = await newConcert.save();
+    req.io.emit('concertsUpdated', savedConcert);
+    const concerts = await Concert.find();
+    res.json(concerts);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Internal server error' });
+  }
 });
 
-// Update a concerts
-router.put('/:id', (req, res) => {
-   const id = req.params.id;
-   const concert = db.concerts.find((item) => item.id === id);
-   if (concert) {
-     concert.performer = req.body.performer;
-     concert.genre = req.body.genre;
-     concert.price = req.body.price;
-     concert.day = req.body.day;
-     concert.image = req.body.image;
-     res.json(concert);
-   } else {
-     res.status(404).json({ message: 'Concert not found' });
-   }
+
+// Update a seat
+router.put('/concerts/:id', async (req, res) => {
+  const { id } = req.params;
+  try {
+    const updatedConcert = await Concert.findByIdAndUpdate(id, req.body, { new: true });
+    if (!updatedConcert) {
+      return res.status(404).json({ message: 'Not found' });
+    }
+    res.json({ message: 'Concert updated', updatedConcert });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
 });
 
-// Delete a concerts
-router.delete('/:id', (req, res) => {
-   const id = req.params.id;
-   const index = db.concerts.findIndex((item) => item.id === id);
-   if (index !== -1) {
-     db.concerts.splice(index, 1);
-     res.json({ message: 'Concert deleted' });
-   } else {
-     res.status(404).json({ message: 'Concert not found' });
-   }
+// Delete a concert
+router.delete('/concerts/:id', async (req, res) => {
+  const id = req.params.id;
+  try {
+    const concert = await Concert.findOneAndDelete({ id });
+    if (concert) {
+      res.json({ message: 'Concert deleted' });
+    } else {
+      res.status(404).json({ message: 'Concert not found' });
+    }
+  } catch (error) {
+    res.status(500).json({ message: 'Server error' });
+  }
 });
 
 module.exports = router;

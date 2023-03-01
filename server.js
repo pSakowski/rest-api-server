@@ -31,16 +31,16 @@ app.use((req, res, next) => {
 });
 
 // API endpoints
-app.use('/api/concerts', concertsRouter);
+app.use('/api', concertsRouter);
 app.use('/api', seatsRoutes);
-app.use('/api/testimonials', testimonialsRouter);
+app.use('/api', testimonialsRouter);
 
 // Return the main index.html file for all other routes
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, '/build/index.html'));
 });
 
-const server = app.listen('8000', () => {
+const server = app.listen(process.env.PORT || 8000, () => {
   console.log('Server is running on port: 8000');
 });
 
