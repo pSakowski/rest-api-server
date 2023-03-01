@@ -37,7 +37,7 @@ app.use('/api', testimonialsRouter);
 
 // Return the main index.html file for all other routes
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '/build/index.html'));
+  res.sendFile(path.join(__dirname, '/client/build/index.html'));
 });
 
 const server = app.listen(process.env.PORT || 8000, () => {
