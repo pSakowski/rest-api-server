@@ -46,22 +46,14 @@ const server = app.listen(process.env.PORT || 8000, () => {
 
 const io = socket(server);
 
-let seats = [];
+io.on('connection', (socket) => {
+  console.log('New socket!');
 
-io.on('connection', socket => {
-  console.log('New client connected');
+  socket.on('disconnect', () => {
+    console.log('Socket disconnected');
+  });
 
-  // Send initial seats data to new client
-  socket.emit('seatsUpdated', seats);
-
-  // Listen for seatUpdated event
-  socket.on('seatUpdated', (updatedSeat) => {
-    // Update the seat in the seats array
-    const index = seats.findIndex(seat => seat.id === updatedSeat.id);
-    if (index !== -1) {
-      seats[index] = updatedSeat;
-      // Emit seatsUpdated event to all clients
-      io.emit('seatsUpdated', seats);
-    }
+  socket.on('seatsUpdated', (seats) => {
+    io.emit('seatsUpdated', seats);
   });
 });

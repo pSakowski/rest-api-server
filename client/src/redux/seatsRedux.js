@@ -22,7 +22,7 @@ export const startRequest = payload => ({ payload, type: START_REQUEST });
 export const endRequest = payload => ({ payload, type: END_REQUEST });
 export const errorRequest = payload => ({ payload, type: ERROR_REQUEST });
 export const loadSeats = payload => ({ payload, type: LOAD_SEATS });
-export const addSeat = payload => ({ payload: Array.isArray(payload) ? payload : [payload], type: ADD_SEAT });
+export const addSeat = payload => ({ payload, type: ADD_SEAT });
 
 /* THUNKS */
 
@@ -53,7 +53,7 @@ export const addSeatRequest = (seat) => {
 
       // Emit a new event to all connected clients
       const seats = await axios.get(`${API_URL}/seats`);
-      io().emit('seatsUpdated', seats.data); // update this line
+      io().emit('seatsUpdated', seats.data);
 
     } catch(e) {
       dispatch(errorRequest({ name: 'ADD_SEAT', error: e.message }));
