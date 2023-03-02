@@ -40,16 +40,28 @@ db.once('open', () => {
 });
 db.on('error', err => console.log('Error ' + err));
 
-const server = app.listen(process.env.PORT || 3000, () => {
-  console.log('Server is running on port: 3000');
+const server = app.listen(process.env.PORT || 8000, () => {
+  console.log('Server is running on port: 8000');
 });
 
 const io = socket(server);
 
-io.on('connection', (socket) => {
-  console.log('New socket!');
+let seats = [];
 
-  socket.on('disconnect', () => {
-    console.log('Socket disconnected');
+io.on('connection', socket => {
+  console.log('New client connected');
+
+  // Send initial seats data to new client
+  socket.emit('seatsUpdated', seats);
+
+  // Listen for seatUpdated event
+  socket.on('seatUpdated', (updatedSeat) => {
+    // Update the seat in the seats array
+    const index = seats.findIndex(seat => seat.id === updatedSeat.id);
+    if (index !== -1) {
+      seats[index] = updatedSeat;
+      // Emit seatsUpdated event to all clients
+      io.emit('seatsUpdated', seats);
+    }
   });
 });

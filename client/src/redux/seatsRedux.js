@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { API_URL } from '../config';
+import io from 'socket.io-client';
 
 /* SELECTORS */
 export const getSeats = ({ seats }) => seats.data;
@@ -14,16 +15,14 @@ const createActionName = name => `app/${reducerName}/${name}`;
 const START_REQUEST = createActionName('START_REQUEST');
 const END_REQUEST = createActionName('END_REQUEST');
 const ERROR_REQUEST = createActionName('ERROR_REQUEST');
-
 const LOAD_SEATS = createActionName('LOAD_SEATS');
 const ADD_SEAT = createActionName('ADD_SEAT');
 
 export const startRequest = payload => ({ payload, type: START_REQUEST });
 export const endRequest = payload => ({ payload, type: END_REQUEST });
 export const errorRequest = payload => ({ payload, type: ERROR_REQUEST });
-
 export const loadSeats = payload => ({ payload, type: LOAD_SEATS });
-export const addSeat = payload => ({ payload, type: ADD_SEAT });
+export const addSeat = payload => ({ payload: Array.isArray(payload) ? payload : [payload], type: ADD_SEAT });
 
 /* THUNKS */
 
@@ -46,18 +45,19 @@ export const loadSeatsRequest = () => {
 
 export const addSeatRequest = (seat) => {
   return async dispatch => {
-
     dispatch(startRequest({ name: 'ADD_SEAT' }));
     try {
-
       let res = await axios.post(`${API_URL}/seats`, seat);
-      dispatch(addSeat(res));
+      dispatch(addSeat(res.data));
       dispatch(endRequest({ name: 'ADD_SEAT' }));
+
+      // Emit a new event to all connected clients
+      const seats = await axios.get(`${API_URL}/seats`);
+      io().emit('seatsUpdated', seats.data); // update this line
 
     } catch(e) {
       dispatch(errorRequest({ name: 'ADD_SEAT', error: e.message }));
     }
-
   };
 };
 
@@ -73,9 +73,9 @@ const initialState = {
 export default function reducer(statePart = initialState, action = {}) {
   switch (action.type) {
     case LOAD_SEATS: 
-      return { ...statePart, data: [...action.payload] };
-    case ADD_SEAT: 
-      return { ...statePart, data: [...statePart.data, action.payload] }
+      return { ...statePart, data: Array.isArray(action.payload) ? [...action.payload] : [] };
+    case ADD_SEAT:
+      return { ...statePart, data: [...statePart.data, ...(Array.isArray(action.payload) ? action.payload : [action.payload])] }
     case START_REQUEST:
       return { ...statePart, requests: {...statePart.requests, [action.payload.name]: { pending: true, error: null, success: false }} };
     case END_REQUEST:

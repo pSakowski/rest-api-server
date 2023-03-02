@@ -77,7 +77,7 @@ exports.updateSeat = async (req, res) => {
 exports.deleteSeat = async (req, res) => {
   const { id } = req.params;
   try {
-    const seat = await Seat.findOneAndDelete({ id });
+    const seat = await Seat.findOneAndDelete({ _id: id });
     if (seat) {
       res.json({ message: 'Seat deleted' });
     } else {
@@ -86,4 +86,4 @@ exports.deleteSeat = async (req, res) => {
   } catch (error) {
     res.status(500).json({ message: 'Server error' });
   }
-}
+};
