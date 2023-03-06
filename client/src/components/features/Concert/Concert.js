@@ -2,7 +2,7 @@ import { Row, Col } from 'reactstrap';
 
 import './Concert.scss';
 
-const Concert = ({ performer, price, genre, day, image }) => (
+const Concert = ({ tickets, performer, price, genre, day, image }) => (
   <article className="concert">
     <Row noGutters>
       <Col xs="6">
@@ -13,6 +13,7 @@ const Concert = ({ performer, price, genre, day, image }) => (
       <Col xs="6">
         <div className="concert__info">
           <img className="concert__info__back" src={image} alt={performer}/>
+          <h1 className="concert__info__tickets">Only <span>{ tickets } tickets</span> left!</h1>
           <h2 className="concert__info__performer">{ performer }</h2>
           <h3 className="concert__info__genre">{ genre }</h3>
           <p className="concert__info__day-n-price">Day: {day}, Price: { price }$</p>

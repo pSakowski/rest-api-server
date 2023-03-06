@@ -34,6 +34,18 @@
       -webkit-filter: grayscale(0.5) blur(2px);
     }
 
+    &__tickets {
+      opacity: 0.8;
+      font-size: 0.9rem;
+      position: absolute;
+      bottom: 3rem;
+      left: 1.5rem;
+
+      span {
+        color: greenyellow;
+      }
+    }
+
     &__performer {
       position: relative;
       z-index: 2;

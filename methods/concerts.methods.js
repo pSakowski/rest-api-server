@@ -41,9 +41,9 @@ exports.getConcertById = async (req, res) => {
 }
 
 exports.addNewConcert = async (req, res) => {
-  const { id, performer, genre, price, day, image } = req.body;
+  const { id, performer, genre, price, day, image, tickets } = req.body;
   try {
-    const newConcert = new Concert({ id, performer, genre, price, day, image });
+    const newConcert = new Concert({ id, performer, genre, price, day, image, tickets });
     const savedConcert = await newConcert.save();
     req.io.emit('concertsUpdated', savedConcert);
     const concerts = await Concert.find();
