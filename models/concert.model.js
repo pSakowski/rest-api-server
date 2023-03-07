@@ -1,10 +1,6 @@
 const mongoose = require('mongoose');
 
 const concertSchema = new mongoose.Schema({
-  id: {
-    type: Number,
-    required: true
-  },
   performer: {
     type: String, 
     required: true 
@@ -25,10 +21,6 @@ const concertSchema = new mongoose.Schema({
     type: String, 
     required: true 
   },
-  tickets: {
-    type: Number,
-    required: true
-  }
 });
 
 module.exports = mongoose.model('Concert', concertSchema);

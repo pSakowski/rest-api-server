@@ -41,9 +41,9 @@ exports.getConcertById = async (req, res) => {
 }
 
 exports.addNewConcert = async (req, res) => {
-  const { id, performer, genre, price, day, image, tickets } = req.body;
+  const { id, performer, genre, price, day, image } = req.body;
   try {
-    const newConcert = new Concert({ id, performer, genre, price, day, image, tickets });
+    const newConcert = new Concert({ id, performer, genre, price, day, image });
     const savedConcert = await newConcert.save();
     req.io.emit('concertsUpdated', savedConcert);
     const concerts = await Concert.find();
@@ -79,5 +79,49 @@ exports.deleteConcert = async (req, res) => {
     }
   } catch (error) {
     res.status(500).json({ message: 'Server error' });
+  }
+}
+
+exports.getConcertsByPerformer = async (req, res) => {
+  const { performer } = req.params;
+  try {
+    const concerts = await Concert.find({ performer });
+    res.json(concerts);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+}
+
+exports.getConcertsByGenre = async (req, res) => {
+  const { genre } = req.params;
+  try {
+    const concerts = await Concert.find({ genre });
+    res.json(concerts);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+}
+
+exports.getConcertsByPriceRange = async (req, res) => {
+  const { price_min, price_max } = req.params;
+  try {
+    const concerts = await Concert.find({ price: { $gte: price_min, $lte: price_max } });
+    res.json(concerts);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+}
+
+exports.getConcertsByDay = async (req, res) => {
+  const { day } = req.params;
+  try {
+    const concerts = await Concert.find({ day });
+    res.json(concerts);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Internal server error' });
   }
 }

@@ -23,16 +23,17 @@ app.use((req, res, next) => {
 });
 
 // API endpoints
-app.use('/api', concertsRouter);
-app.use('/api', seatsRoutes);
-app.use('/api', testimonialsRouter);
+app.use('/api/', concertsRouter);
+app.use('/api/', seatsRoutes);
+app.use('/api/', testimonialsRouter);
 
 // Return the main index.html file for all other routes
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, '/client/build/index.html'));
 });
 
-mongoose.connect('mongodb+srv://pees:Pees1@cluster0.hawsg2s.mongodb.net/?retryWrites=true&w=majority', { useNewUrlParser: true });
+// mongoose.connect('mongodb+srv://pees:Pees1@cluster0.hawsg2s.mongodb.net/?retryWrites=true&w=majority', { useNewUrlParser: true });
+mongoose.connect('mongodb://127.0.0.1:27017/NewWaveDB', { useNewUrlParser: true });
 const db = mongoose.connection;
 
 db.once('open', () => {
@@ -57,3 +58,5 @@ io.on('connection', (socket) => {
     io.emit('seatsUpdated', seats);
   });
 });
+
+module.exports = server;

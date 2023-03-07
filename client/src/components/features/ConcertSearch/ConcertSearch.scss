@@ -1,0 +1,25 @@
+.concert-search {
+  margin-bottom: 15px;
+}
+
+.concert-search .form-group {
+  margin-bottom: 15px;
+  width: 100%;
+}
+
+.concert-search .form-group label {
+  display: block;
+}
+
+.concert-search .form-group select,
+.concert-search .form-group input[type="text"] {
+  width: 100%;
+  max-width: 100%;
+}
+
+.concert-search button {
+  display: block;
+  margin-top: 25px;
+  margin-left: auto;
+  margin-right: auto;
+}
