@@ -9,18 +9,13 @@ const testimonialsRouter = require('./routes/testimonials.routes');
 
 const app = express();
 
-// Serve static files from the React app
-app.use(express.static(path.join(__dirname, '/client/build')));
-
+// Middleware
 app.use(cors());
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 
-// Pass the `io` object to the request object for use in route handlers
-app.use((req, res, next) => {
-  req.io = io;
-  next();
-});
+// Serve static files from the React app
+app.use(express.static(path.join(__dirname, '/client/build')));
 
 // API endpoints
 app.use('/api/', concertsRouter);
@@ -32,21 +27,34 @@ app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, '/client/build/index.html'));
 });
 
-// mongoose.connect('mongodb+srv://pees:Pees1@cluster0.hawsg2s.mongodb.net/?retryWrites=true&w=majority', { useNewUrlParser: true });
-mongoose.connect('mongodb://127.0.0.1:27017/NewWaveDB', { useNewUrlParser: true });
+// FOR BUILD : mongoose.connect('mongodb://127.0.0.1:27017/NewWaveDB', { useNewUrlParser: true });
+// Connect to MongoDB
+mongoose.connect('mongodb+srv://pees:Pees1@cluster0.hawsg2s.mongodb.net/?retryWrites=true&w=majority', { useNewUrlParser: true });
 const db = mongoose.connection;
 
+// Handle MongoDB connection events
 db.once('open', () => {
   console.log('Connected to the database');
 });
-db.on('error', err => console.log('Error ' + err));
 
+db.on('error', err => {
+  console.log('Error ' + err);
+});
+
+// Start the server and socket.io
 const server = app.listen(process.env.PORT || 8000, () => {
   console.log('Server is running on port: 8000');
 });
 
 const io = socket(server);
 
+// Middleware to pass the `io` object to route handlers
+app.use((req, res, next) => {
+  req.io = io;
+  next();
+});
+
+// Handle socket.io events
 io.on('connection', (socket) => {
   console.log('New socket!');
 
