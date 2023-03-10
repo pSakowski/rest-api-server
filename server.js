@@ -9,10 +9,6 @@ const testimonialsRouter = require('./routes/testimonials.routes');
 
 const app = express();
 
-const dbURI = process.env.NODE_ENV === 'production'
-  ? `mongodb+srv://pees:${process.env.DB_PASS}@cluster0.hawsg2s.mongodb.net/?retryWrites=true&w=majority`
-  : 'mongodb://127.0.0.1:27017/NewWaveDB';
-
 // Middleware
 app.use(cors());
 app.use(express.urlencoded({ extended: false }));
@@ -31,10 +27,16 @@ app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, '/client/build/index.html'));
 });
 
-// FOR BUILD : mongoose.connect('mongodb://127.0.0.1:27017/NewWaveDB', { useNewUrlParser: true });
-// Connect to MongoDB
-// mongoose.connect('mongodb+srv://pees:Pees1@cluster0.hawsg2s.mongodb.net/?retryWrites=true&w=majority', { useNewUrlParser: true });
+// BUILD
+// mongoose.connect('mongodb://127.0.0.1:27017/NewWaveDB', { useNewUrlParser: true });
 // const db = mongoose.connection;
+
+// Connect to MongoDB using the secret variable
+const mySecret = process.env.DB_PASS;
+const dbURI = `mongodb+srv://pees:${mySecret}@cluster0.hawsg2s.mongodb.net/?retryWrites=true&w=majority`;
+
+mongoose.connect(dbURI, { useNewUrlParser: true });
+const db = mongoose.connection;
 
 // Handle MongoDB connection events
 db.once('open', () => {
