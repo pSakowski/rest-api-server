@@ -1,18 +1,20 @@
+const app = express();
 const mongoose = require('mongoose');
 const socket = require('socket.io');
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
+const helmet = require('helmet');
+
 const concertsRouter = require('./routes/concerts.routes');
 const seatsRoutes = require('./routes/seats.routes');
 const testimonialsRouter = require('./routes/testimonials.routes');
-
-const app = express();
 
 // Middleware
 app.use(cors());
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
+app.use(helmet());
 
 // Serve static files from the React app
 app.use(express.static(path.join(__dirname, '/client/build')));
