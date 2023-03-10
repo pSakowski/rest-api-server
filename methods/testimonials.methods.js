@@ -1,5 +1,6 @@
 const Testimonial = require('../models/testimonial.model');
 const { ObjectId } = require('mongodb');
+const sanitize = require('mongo-sanitize');
 
 // Get all testimonials
 exports.getAllTestimonials = async (req, res) => {
@@ -47,7 +48,7 @@ exports.getTestimonialById = async (req, res) => {
 exports.addTestimonial = async (req, res) => {
   const { author, text } = req.body;
   try {
-    const newTestimonial = new Testimonial({ author, text });
+    const newTestimonial = new Testimonial({ author: sanitize(author), text: sanitize(text) });
     const savedTestimonial = await newTestimonial.save();
     req.io.emit('testimonialUpdated', savedTestimonial);
     const testimonial = await Testimonial.find();

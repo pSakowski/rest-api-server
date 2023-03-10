@@ -1,5 +1,6 @@
 const Seat = require('../models/seat.model');
 const { ObjectId } = require('mongodb');
+const sanitize = require('mongo-sanitize');
 
 // Get all seats
 exports.getAllSeats = async (req, res) => {
@@ -45,9 +46,9 @@ exports.getSeatById = async (req, res) => {
 
 // Create a seat
 exports.createSeat = async (req, res) => {
-  const { day, seat, client, email } = req.body;
+  const { day, seat, client, email } = sanitize(req.body); // sanitize the request body
   try {
-    const newSeat = new Seat({day, seat, client, email});
+    const newSeat = new Seat({ day, seat, client, email });
     const savedSeat = await newSeat.save();
     req.io.emit('seatsUpdated', savedSeat);
     const seats = await Seat.find();

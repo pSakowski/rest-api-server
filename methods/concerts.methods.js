@@ -1,5 +1,6 @@
 const Concert = require('../models/concert.model');
 const { ObjectId } = require('mongodb');
+const sanitize = require('mongo-sanitize');
 
 exports.getAllConcerts = async(req, res) => {
   try {
@@ -41,7 +42,7 @@ exports.getConcertById = async (req, res) => {
 }
 
 exports.addNewConcert = async (req, res) => {
-  const { id, performer, genre, price, day, image } = req.body;
+  const { id, performer, genre, price, day, image } = sanitize(req.body); // Sanitize the request body
   try {
     const newConcert = new Concert({ id, performer, genre, price, day, image });
     const savedConcert = await newConcert.save();
@@ -52,7 +53,7 @@ exports.addNewConcert = async (req, res) => {
     console.error(err);
     res.status(500).json({ message: 'Internal server error' });
   }
-}
+};
 
 exports.updateConcert = async (req, res) => {
   const { id } = req.params;
